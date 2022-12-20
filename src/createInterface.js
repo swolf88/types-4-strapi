@@ -31,14 +31,17 @@ module.exports = (schemaPath, interfaceName) => {
         ? 'User'
         : `${pascalCase(attributeValue.target.split('.')[1])}`;
       const tsImportPath = `./${tsPropertyType}`;
-      if (tsImports.every((x) => x.path !== tsImportPath))
+      let addSuffix = interfaceName !== tsPropertyType;
+      if (tsImports.every((x) => x.path !== tsImportPath) && addSuffix) {
         tsImports.push({
-          type: tsPropertyType,
+          type: `${tsPropertyType} as ${tsPropertyType}Entity`,
           path: tsImportPath,
         });
+      }
       const isArray = attributeValue.relation.endsWith('ToMany');
       const bracketsIfArray = isArray ? '[]' : '';
-      tsProperty = `    ${attributeName}: { data: ${tsPropertyType}${bracketsIfArray} };\n`;
+      const EntitySuffix = addSuffix ? "Entity": "";
+      tsProperty = `    ${attributeName}: { data: ${tsPropertyType}${EntitySuffix}${bracketsIfArray} };\n`;
     }
     // -------------------------------------------------
     // Component
@@ -51,12 +54,12 @@ module.exports = (schemaPath, interfaceName) => {
       const tsImportPath = `./components/${tsPropertyType}`;
       if (tsImports.every((x) => x.path !== tsImportPath))
         tsImports.push({
-          type: tsPropertyType,
+          type: `${tsPropertyType} as ${tsPropertyType}Component`,
           path: tsImportPath,
         });
       const isArray = attributeValue.repeatable;
       const bracketsIfArray = isArray ? '[]' : '';
-      tsProperty = `    ${attributeName}: ${tsPropertyType}${bracketsIfArray};\n`;
+      tsProperty = `    ${attributeName}: ${tsPropertyType}Component${bracketsIfArray};\n`;
     }
     // -------------------------------------------------
     // Dynamic zone

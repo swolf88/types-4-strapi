@@ -32,12 +32,12 @@ module.exports = (schemaPath, interfaceName) => {
       const tsImportPath = `../${tsType}`;
       if (tsImports.every((x) => x.path !== tsImportPath))
         tsImports.push({
-          type: tsType,
+          type: `${tsType} as ${tsType}Entity`,
           path: tsImportPath,
         });
       const isArray = attributeValue.relation === 'oneToMany';
       const bracketsIfArray = isArray ? '[]' : '';
-      tsProperty = `  ${attributeName}: { data: ${tsType}${bracketsIfArray} };\n`;
+      tsProperty = `  ${attributeName}: { data: ${tsType}Entity${bracketsIfArray} };\n`;
     }
     // -------------------------------------------------
     // Component
