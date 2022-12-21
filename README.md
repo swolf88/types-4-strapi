@@ -5,8 +5,13 @@ Typescript interface generator for Strapi 4 models.
 ## Install locally
 
 ```bash
-npm i --save-dev types-4-strapi
+npm i --save @dsolodky/types-4-strapi
 ```
+
+```bash
+yarn add @dsolodky/types-4-strapi
+```
+
 
 Add t4s to your scripts:
 
@@ -29,8 +34,15 @@ npm run t4s
 ## Install globally
 
 ```bash
-npm i -g types-4-strapi
+npm i -g @dsolodky/types-4-strapi
 ```
+
+or
+
+```bash
+yarn install @dsolodky/types-4-strapi
+```
+
 
 Then run with:
 
