@@ -38,7 +38,7 @@ Then run with:
 t4s
 ```
 
-## Attributes
+## Flat types
 
 For some inscrutable reason, Strapi 4 returns objects where all the properties (aside from `id`) are wrapped into an `attributes` object. The resulting interfaces will look like this:
 
@@ -103,3 +103,7 @@ import {Entity, FlatEntity} from 'types/Entity';
 
 ///export FlatEntity = Entity['attributes'];
 ```
+
+## CM types
+
+Content manager (CM) plugin stores its data in flattened way, so in order to let that code to be strongly typed, the CM_XXX types are being generated.

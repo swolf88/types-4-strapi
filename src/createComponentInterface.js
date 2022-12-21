@@ -4,8 +4,10 @@ const { pascalCase, isOptional } = require('./utils');
 module.exports = (schemaPath, interfaceName) => {
   var tsImports = [];
   var tsInterface = `\n`;
+  var cmInterface = `\n`;
   tsInterface += `export interface ${interfaceName} {\n`;
   tsInterface += `  id: number;\n`;
+  cmInterface += `export interface CM_${interfaceName} {\n`;
   var schemaFile;
   var schema;
   try {
@@ -22,6 +24,7 @@ module.exports = (schemaPath, interfaceName) => {
     if (isOptional(attributeValue)) attributeName += '?';
     var tsType;
     var tsProperty;
+    var cmProperty;
     // -------------------------------------------------
     // Relation
     // -------------------------------------------------
@@ -32,12 +35,13 @@ module.exports = (schemaPath, interfaceName) => {
       const tsImportPath = `../${tsType}`;
       if (tsImports.every((x) => x.path !== tsImportPath))
         tsImports.push({
-          type: `${tsType} as ${tsType}Entity`,
+          type: `${tsType} as ${tsType}Entity, CM_${tsType} as CM_${tsType}Entity`,
           path: tsImportPath,
         });
       const isArray = attributeValue.relation === 'oneToMany';
       const bracketsIfArray = isArray ? '[]' : '';
       tsProperty = `  ${attributeName}: { data: ${tsType}Entity${bracketsIfArray} };\n`;
+      cmProperty = `  ${attributeName}: CM_${tsType}Entity${bracketsIfArray};\n`;
     }
     // -------------------------------------------------
     // Component
@@ -50,12 +54,13 @@ module.exports = (schemaPath, interfaceName) => {
       var tsImportPath = `./${tsType}`;
       if (tsImports.every((x) => x.path !== tsImportPath))
         tsImports.push({
-          type: tsType,
+          type: `${tsType}, CM_${tsType}`,
           path: tsImportPath,
         });
       const isArray = attributeValue.repeatable;
       const bracketsIfArray = isArray ? '[]' : '';
       tsProperty = `  ${attributeName}: ${tsType}${bracketsIfArray};\n`;
+      cmProperty = `  ${attributeName}: CM_${tsType}${bracketsIfArray};\n`;
     }
     // -------------------------------------------------
     // Media
@@ -65,12 +70,15 @@ module.exports = (schemaPath, interfaceName) => {
       const tsImportPath = '../Media';
       if (tsImports.every((x) => x.path !== tsImportPath))
         tsImports.push({
-          type: tsType,
+          type: `${tsType}, CM_${tsType}`,
           path: tsImportPath,
         });
       tsProperty = `  ${attributeName}: { data: ${tsType}${
         attributeValue.multiple ? '[]' : ''
       } };\n`;
+      cmProperty = `  ${attributeName}: CM_${tsType}${
+        attributeValue.multiple ? '[]' : ''
+      };\n`;
     }
     // -------------------------------------------------
     // Enumeration
@@ -78,6 +86,7 @@ module.exports = (schemaPath, interfaceName) => {
     else if (attributeValue.type === 'enumeration') {
       const enumOptions = attributeValue.enum.map((v) => `'${v}'`).join(' | ');
       tsProperty = `  ${attributeName}: ${enumOptions};\n`;
+      cmProperty = `  ${attributeName}: ${enumOptions};\n`;
     }
     // -------------------------------------------------
     // Text, RichText, Email, UID
@@ -91,6 +100,7 @@ module.exports = (schemaPath, interfaceName) => {
     ) {
       tsType = 'string';
       tsProperty = `  ${attributeName}: ${tsType};\n`;
+      cmProperty = `  ${attributeName}: ${tsType};\n`;
     }
     // -------------------------------------------------
     // Json
@@ -98,12 +108,14 @@ module.exports = (schemaPath, interfaceName) => {
     else if (attributeValue.type === 'json') {
       tsType = 'any';
       tsProperty = `  ${attributeName}: ${tsType};\n`;
+      cmProperty = `  ${attributeName}: ${tsType};\n`;
     }
     // -------------------------------------------------
     // Password
     // -------------------------------------------------
     else if (attributeValue.type === 'password') {
       tsProperty = '';
+      cmProperty = '';
     }
     // -------------------------------------------------
     // Number
@@ -116,6 +128,7 @@ module.exports = (schemaPath, interfaceName) => {
     ) {
       tsType = 'number';
       tsProperty = `  ${attributeName}: ${tsType};\n`;
+      cmProperty = `  ${attributeName}: ${tsType};\n`;
     }
     // -------------------------------------------------
     // Date
@@ -127,6 +140,7 @@ module.exports = (schemaPath, interfaceName) => {
     ) {
       tsType = 'Date';
       tsProperty = `  ${attributeName}: ${tsType};\n`;
+      cmProperty = `  ${attributeName}: ${tsType};\n`;
     }
     // -------------------------------------------------
     // Boolean
@@ -134,6 +148,7 @@ module.exports = (schemaPath, interfaceName) => {
     else if (attributeValue.type === 'boolean') {
       tsType = 'boolean';
       tsProperty = `  ${attributeName}: ${tsType};\n`;
+      cmProperty = `  ${attributeName}: ${tsType};\n`;
     }
     // -------------------------------------------------
     // Others
@@ -141,10 +156,13 @@ module.exports = (schemaPath, interfaceName) => {
     else {
       tsType = 'any';
       tsProperty = `  ${attributeName}: ${tsType};\n`;
+      cmProperty = `  ${attributeName}: ${tsType};\n`;
     }
     tsInterface += tsProperty;
+    cmInterface += cmProperty;
   }
   tsInterface += '}\n';
+  tsInterface += cmInterface + '}\n';;
   for (const tsImport of tsImports) {
     tsInterface =
       `import { ${tsImport.type} } from '${tsImport.path}';\n` + tsInterface;

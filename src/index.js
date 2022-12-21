@@ -44,6 +44,10 @@ const userTsInterface = `export interface User {
     updatedAt: Date;
   }
 }
+
+export type FlatUser = User['attributes'];
+
+export type CM_User = FlatUser;
 `;
 
 fs.writeFileSync(`${typesDir}/User.ts`, userTsInterface);
@@ -93,6 +97,10 @@ export interface Media {
     updatedAt: Date;
   }
 }
+
+export type FlatMedia = Media['attributes'];
+
+export type CM_Media = FlatMedia;
 `;
 
 fs.writeFileSync(`${typesDir}/Media.ts`, mediaTsInterface);
