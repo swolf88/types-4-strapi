@@ -32,7 +32,9 @@ fs.writeFileSync(`${typesDir}/Payload.ts`, payloadTsInterface);
 // User
 // --------------------------------------------
 
-const userTsInterface = `export interface User {
+const userTsInterface = `export const UserAPI = "plugin::users-permissions.user";
+
+export interface User {
   id: number;
   attributes: {
     username: string;

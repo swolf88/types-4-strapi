@@ -2,14 +2,6 @@ const fs = require('fs');
 const { pascalCase, isOptional } = require('./utils');
 
 module.exports = (schemaPath, interfaceName) => {
-  var tsImports = [];
-  var tsInterface = `\n`;
-  var cmInterface = `\n`;
-  tsInterface += `export interface ${interfaceName} {\n`;
-  tsInterface += `  id: number;\n`;
-  tsInterface += `  attributes: {\n`;
-
-  cmInterface += `export interface CM_${interfaceName} {\n`;
   var schemaFile;
   var schema;
   try {
@@ -19,6 +11,15 @@ module.exports = (schemaPath, interfaceName) => {
     console.log(`Skipping ${schemaPath}: could not parse schema`, e);
     return null;
   }
+  var tsImports = [];
+  var tsInterface = `\n`;
+  var cmInterface = `\n`;
+  tsInterface += `export const ${interfaceName}API = "api::${schema.info.singularName}.${schema.info.singularName}";\n\n`;
+  tsInterface += `export interface ${interfaceName} {\n`;
+  tsInterface += `  id: number;\n`;
+  tsInterface += `  attributes: {\n`;
+
+  cmInterface += `export interface CM_${interfaceName} {\n`;
   const attributes = Object.entries(schema.attributes);
   for (const attribute of attributes) {
     var attributeName = attribute[0];
