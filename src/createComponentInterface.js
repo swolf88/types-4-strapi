@@ -140,7 +140,7 @@ module.exports = (schemaPath, interfaceName) => {
     ) {
       tsType = 'Date';
       tsProperty = `  ${attributeName}: ${tsType};\n`;
-      cmProperty = `  ${attributeName}: ${tsType};\n`;
+      cmProperty = `  ${attributeName}: string;\n`;
     }
     // -------------------------------------------------
     // Boolean
