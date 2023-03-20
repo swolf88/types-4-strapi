@@ -111,6 +111,7 @@ fs.writeFileSync(`${typesDir}/Media.ts`, mediaTsInterface);
 // API Types
 // --------------------------------------------
 
+/**@type {Array<string>} */
 var apiFolders;
 try {
   apiFolders = fs.readdirSync('./src/api').filter((x) => !x.startsWith('.'));
@@ -118,16 +119,28 @@ try {
   console.log('No API types found. Skipping...');
 }
 
-if (apiFolders)
-  for (const apiFolder of apiFolders) {
-    const interfaceName = pascalCase(apiFolder);
-    const interface = createInterface(
-      `./src/api/${apiFolder}/content-types/${apiFolder}/schema.json`,
-      interfaceName
-    );
+/**@type {Array<string>} */
+let additionalSchemas = [];
+const configJsonFile = `${typesDir}/Config.json`;
+if (fs.existsSync(configJsonFile)) {
+  const config = JSON.parse(fs.readFileSync(configJsonFile, "utf-8"));
+  additionalSchemas.push(...config?.include ?? []);
+}
+
+const apiSchemas = apiFolders
+  .map(apiFolder => `./src/api/${apiFolder}/content-types/${apiFolder}/schema.json`)
+  .concat(additionalSchemas)
+  .filter(schema => fs.existsSync(schema));
+
+if (apiSchemas) {
+  for (const schemaFile of apiSchemas) {
+    const schema = JSON.parse(fs.readFileSync(schemaFile, 'utf-8'));
+    const interfaceName = pascalCase(schema.info.singularName);
+    const interface = createInterface(schemaFile, interfaceName);
     if (interface)
       fs.writeFileSync(`${typesDir}/${interfaceName}.ts`, interface);
   }
+}
 
 // --------------------------------------------
 // Components
